@@ -4,506 +4,618 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍪 ניהול הזמנות - אפייה ביתית</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #e8a87c;
-            --secondary: #d65db1;
-            --accent: #ff6f91;
-            --bg: #fff5ee;
-            --card-bg: #ffffff;
-            --text: #3d3d3d;
+            --warm1: #f9e4c8;
+            --warm2: #f0c18a;
+            --warm3: #d4883f;
+            --warm4: #a0522d;
+            --warm5: #6b3410;
         }
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: Arial, Helvetica, sans-serif;
-        }
+        body { background: linear-gradient(135deg, #fff8f0, var(--warm1)); min-height: 100vh; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        .navbar { background: linear-gradient(90deg, var(--warm4), var(--warm5)) !important; }
         .navbar-brand { font-size: 1.5rem; font-weight: bold; }
-        .dashboard-card {
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-        .dashboard-card:hover { transform: translateY(-4px); }
-        .dashboard-card .number { font-size: 2rem; font-weight: bold; }
-        .dashboard-card .label { font-size: 0.9rem; opacity: 0.9; }
-        .bg-orders { background: linear-gradient(135deg, #667eea, #764ba2); }
-        .bg-revenue { background: linear-gradient(135deg, #f093fb, #f5576c); }
-        .bg-paid { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-        .bg-unpaid { background: linear-gradient(135deg, #fa709a, #fee140); }
-        .bg-done { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-        .bg-pending { background: linear-gradient(135deg, #fccb90, #d57eeb); }
-        .form-section {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-        }
-        .product-item {
-            background: #f8f0ea;
-            border-radius: 12px;
-            padding: 10px 15px;
-            margin: 5px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .product-item input[type="number"] {
-            width: 60px;
-            text-align: center;
-        }
-        .table-section {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
-        .table thead th {
-            background: #764ba2;
-            color: #fff;
-            border: none;
-            white-space: nowrap;
-        }
-        .table tbody tr:hover { background: #f8f0ea; }
-        .status-badge {
-            cursor: pointer;
-            font-size: 1.1rem;
-            padding: 4px 12px;
-            border-radius: 20px;
-            display: inline-block;
-            user-select: none;
-        }
-        .status-yes { background: #d4edda; }
-        .status-no { background: #f8d7da; }
-        .btn-whatsapp {
-            background: #25d366;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            transition: 0.2s;
-        }
-        .btn-whatsapp:hover { background: #128c7e; color: #fff; transform: scale(1.1); }
-        .btn-delete {
-            background: #ff6b6b;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            transition: 0.2s;
-        }
-        .btn-delete:hover { background: #ee5a24; transform: scale(1.1); }
-        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 15px; }
-        .filter-bar input, .filter-bar select { border-radius: 10px; }
-        .btn-action {
-            border-radius: 12px;
-            padding: 8px 18px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        .btn-action:hover { transform: translateY(-2px); }
-        .section-title { font-weight: bold; color: #764ba2; margin-bottom: 15px; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .card-header { border-radius: 15px 15px 0 0 !important; }
+        .dash-card { background: white; border-radius: 15px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.2s; }
+        .dash-card:hover { transform: translateY(-3px); }
+        .dash-card .number { font-size: 2.2rem; font-weight: bold; color: var(--warm4); }
+        .dash-card .label { color: #666; font-size: 0.95rem; }
+        .dash-card .icon { font-size: 2.5rem; margin-bottom: 5px; }
+        .btn-warm { background: var(--warm3); color: white; border: none; }
+        .btn-warm:hover { background: var(--warm4); color: white; }
+        .btn-warm-outline { border: 2px solid var(--warm3); color: var(--warm4); background: transparent; }
+        .btn-warm-outline:hover { background: var(--warm3); color: white; }
+        .table { border-radius: 10px; overflow: hidden; }
+        .table thead { background: var(--warm4); color: white; }
+        .table tbody tr:hover { background: #fff3e6; }
+        .badge-paid { background: #28a745; }
+        .badge-unpaid { background: #dc3545; }
+        .badge-done { background: #28a745; }
+        .badge-pending { background: #ffc107; color: #333; }
+        .badge-pickup { background: #17a2b8; }
+        .badge-delivery { background: #6f42c1; }
+        .qty-input { width: 60px; text-align: center; }
+        .product-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .filter-bar { background: white; border-radius: 15px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        .whatsapp-btn { color: #25d366; font-size: 1.3rem; cursor: pointer; }
+        .whatsapp-btn:hover { color: #128c7e; }
+        .modal-header { background: linear-gradient(90deg, var(--warm3), var(--warm4)); color: white; }
+        .modal-header .btn-close { filter: invert(1); }
         @media print {
             .no-print { display: none !important; }
-            body { background: #fff; }
-            .dashboard-card { box-shadow: none; border: 1px solid #ccc; }
-            .form-section { display: none; }
-            .filter-bar { display: none !important; }
+            body { background: white !important; }
+            .card { box-shadow: none !important; }
         }
-        .fade-in { animation: fadeIn 0.3s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .toast-container { z-index: 9999; }
     </style>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoi16DXmdeU15XXnCDXlNeW157XoNeV16oiLCJzaG9ydF9uYW1lIjoi15TXltee16DXldeqIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOWU0YzgiLCJ0aGVtZV9jb2xvciI6IiNhMDUyMmQifQ==">
 </head>
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-dark no-print" style="background: linear-gradient(135deg, #764ba2, #e8a87c);">
-    <div class="container">
-        <span class="navbar-brand">🍪 מערכת ניהול הזמנות - אפייה ביתית</span>
+<nav class="navbar navbar-dark mb-4 no-print">
+    <div class="container-fluid">
+        <span class="navbar-brand">🍪 ניהול הזמנות - אפייה ביתית</span>
         <div>
-            <button class="btn btn-sm btn-outline-light btn-action me-2" onclick="exportCSV()">📥 ייצוא CSV</button>
-            <label class="btn btn-sm btn-outline-light btn-action me-2">
-                📤 ייבוא CSV
-                <input type="file" id="csvImport" accept=".csv" onchange="importCSV(event)" hidden>
+            <button class="btn btn-outline-light btn-sm me-2" onclick="printOrders()"><i class="bi bi-printer"></i> הדפסה</button>
+            <button class="btn btn-outline-light btn-sm me-2" onclick="exportCSV()"><i class="bi bi-download"></i> ייצוא CSV</button>
+            <label class="btn btn-outline-light btn-sm">
+                <i class="bi bi-upload"></i> ייבוא CSV
+                <input type="file" accept=".csv" onchange="importCSV(event)" hidden>
             </label>
-            <button class="btn btn-sm btn-outline-light btn-action" onclick="window.print()">🖨️ הדפסה</button>
         </div>
     </div>
 </nav>
 
-<div class="container mt-4">
+<div class="container-fluid px-4">
 
     <!-- Dashboard -->
-    <div class="row g-3 mb-4" id="dashboard">
-        <div class="col-6 col-md-2"><div class="dashboard-card bg-orders fade-in"><div class="number" id="d-total">0</div><div class="label">📋 סה"כ הזמנות</div></div></div>
-        <div class="col-6 col-md-2"><div class="dashboard-card bg-revenue fade-in"><div class="number" id="d-revenue">0</div><div class="label">💰 סה"כ הכנסות</div></div></div>
-        <div class="col-6 col-md-2"><div class="dashboard-card bg-paid fade-in"><div class="number" id="d-paid">0</div><div class="label">✅ שולם</div></div></div>
-        <div class="col-6 col-md-2"><div class="dashboard-card bg-unpaid fade-in"><div class="number" id="d-unpaid">0</div><div class="label">❌ לא שולם</div></div></div>
-        <div class="col-6 col-md-2"><div class="dashboard-card bg-done fade-in"><div class="number" id="d-done">0</div><div class="label">🎉 בוצע</div></div></div>
-        <div class="col-6 col-md-2"><div class="dashboard-card bg-pending fade-in"><div class="number" id="d-pending">0</div><div class="label">⏳ ממתין</div></div></div>
+    <div class="row mb-4" id="dashboard">
+        <div class="col-6 col-md-3 mb-3">
+            <div class="dash-card">
+                <div class="icon">📦</div>
+                <div class="number" id="dashTotal">0</div>
+                <div class="label">סה"כ הזמנות</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="dash-card">
+                <div class="icon">💰</div>
+                <div class="number" id="dashRevenue">₪0</div>
+                <div class="label">סה"כ הכנסות</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="dash-card">
+                <div class="icon">💳</div>
+                <div class="number" id="dashPaid">0 / 0</div>
+                <div class="label">שולם / לא שולם</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="dash-card">
+                <div class="icon">✅</div>
+                <div class="number" id="dashDone">0 / 0</div>
+                <div class="label">בוצע / ממתין</div>
+            </div>
+        </div>
     </div>
 
-    <!-- Add Order Form -->
-    <div class="form-section no-print fade-in">
-        <h4 class="section-title">➕ הוספת הזמנה חדשה</h4>
-        <div class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label">👤 שם לקוח</label>
-                <input type="text" class="form-control" id="f-name" placeholder="שם מלא">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">📞 טלפון</label>
-                <input type="tel" class="form-control" id="f-phone" placeholder="050-1234567">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">📅 תאריך הזמנה</label>
-                <input type="date" class="form-control" id="f-date">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">🚚 סוג</label>
-                <select class="form-select" id="f-delivery">
-                    <option value="איסוף">🏠 איסוף</option>
-                    <option value="משלוח">🚚 משלוח</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="mt-3">
-            <label class="form-label">🍰 מוצרים וכמויות</label>
-            <div id="products-container">
-                <div class="product-item">
-                    <input type="checkbox" class="form-check-input" id="p-alfachores" value="אלפחורס">
-                    <label for="p-alfachores">אלפחורס</label>
-                    <input type="number" class="form-control form-control-sm" id="q-alfachores" min="0" value="0" placeholder="כמות">
-                </div>
-                <div class="product-item">
-                    <input type="checkbox" class="form-check-input" id="p-megulgalot" value="מגולגלות">
-                    <label for="p-megulgalot">מגולגלות</label>
-                    <input type="number" class="form-control form-control-sm" id="q-megulgalot" min="0" value="0" placeholder="כמות">
-                </div>
-                <div class="product-item">
-                    <input type="checkbox" class="form-check-input" id="p-shmarim" value="שמרים">
-                    <label for="p-shmarim">שמרים</label>
-                    <input type="number" class="form-control form-control-sm" id="q-shmarim" min="0" value="0" placeholder="כמות">
-                </div>
-                <div class="product-item">
-                    <input type="checkbox" class="form-check-input" id="p-chocochip" value="עוגיית שוקולד ציפס">
-                    <label for="p-chocochip">עוגיית שוקולד ציפס</label>
-                    <input type="number" class="form-control form-control-sm" id="q-chocochip" min="0" value="0" placeholder="כמות">
-                </div>
-            </div>
-        </div>
-
-        <div class="row g-3 mt-2">
-            <div class="col-md-3">
-                <label class="form-label">💵 עלות כוללת</label>
-                <input type="number" class="form-control" id="f-price" placeholder="₪" min="0">
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="f-paid">
-                    <label class="form-check-label" for="f-paid">💰 שולם</label>
-                </div>
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="f-done">
-                    <label class="form-check-label" for="f-done">✅ בוצע</label>
-                </div>
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <button class="btn btn-lg w-100 text-white btn-action" style="background: linear-gradient(135deg, #764ba2, #e8a87c);" onclick="addOrder()">➕ הוסף הזמנה</button>
-            </div>
-        </div>
+    <!-- Add Order Button -->
+    <div class="mb-3 no-print">
+        <button class="btn btn-warm btn-lg" data-bs-toggle="modal" data-bs-target="#orderModal" onclick="resetForm()">
+            <i class="bi bi-plus-circle"></i> הזמנה חדשה
+        </button>
     </div>
 
     <!-- Filters -->
-    <div class="table-section fade-in">
-        <h4 class="section-title">📦 רשימת הזמנות</h4>
-        <div class="filter-bar no-print">
-            <input type="text" class="form-control" id="filter-name" placeholder="🔍 חיפוש לפי שם לקוח" oninput="renderOrders()" style="max-width:220px;">
-            <input type="date" class="form-control" id="filter-date" onchange="renderOrders()" style="max-width:180px;">
-            <select class="form-select" id="filter-status" onchange="renderOrders()" style="max-width:180px;">
-                <option value="all">📋 הכל</option>
-                <option value="pending">⏳ לא בוצע</option>
-                <option value="done">✅ בוצע</option>
-                <option value="unpaid">❌ לא שולם</option>
-                <option value="paid">💰 שולם</option>
-            </select>
-            <button class="btn btn-outline-secondary btn-action" onclick="clearFilters()">🔄 נקה מסננים</button>
+    <div class="filter-bar no-print">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-bold">🔍 חיפוש לקוח</label>
+                <input type="text" class="form-control" id="filterName" placeholder="שם לקוח..." oninput="renderOrders()">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold">📅 מתאריך</label>
+                <input type="date" class="form-control" id="filterDateFrom" onchange="renderOrders()">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold">📅 עד תאריך</label>
+                <input type="date" class="form-control" id="filterDateTo" onchange="renderOrders()">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold">סינון</label>
+                <select class="form-select" id="filterStatus" onchange="renderOrders()">
+                    <option value="all">הכל</option>
+                    <option value="notDone">לא בוצע</option>
+                    <option value="notPaid">לא שולם</option>
+                    <option value="done">בוצע</option>
+                    <option value="paid">שולם</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-warm-outline w-100" onclick="clearFilters()"><i class="bi bi-x-circle"></i> נקה סינון</button>
+            </div>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle" id="ordersTable">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>👤 שם</th>
-                        <th>📞 טלפון</th>
-                        <th>📅 תאריך</th>
-                        <th>🍰 מוצרים</th>
-                        <th>💵 עלות</th>
-                        <th>💰 שולם</th>
-                        <th>✅ בוצע</th>
-                        <th>🚚 סוג</th>
-                        <th class="no-print">פעולות</th>
-                    </tr>
-                </thead>
-                <tbody id="ordersBody"></tbody>
-            </table>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="card mt-3">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0">📋 רשימת הזמנות</h5>
         </div>
-        <div id="no-results" class="text-center text-muted py-4" style="display:none;">
-            <span style="font-size:2rem;">🔍</span><br>לא נמצאו הזמנות
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>שם לקוח</th>
+                            <th>טלפון</th>
+                            <th>תאריך הזמנה</th>
+                            <th>פריטים</th>
+                            <th>עלות</th>
+                            <th>שולם</th>
+                            <th>בוצע</th>
+                            <th>סוג</th>
+                            <th class="no-print">פעולות</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersBody"></tbody>
+                </table>
+            </div>
+            <div class="text-center py-4 text-muted" id="emptyState" style="display:none;">
+                <i class="bi bi-inbox" style="font-size:3rem;"></i>
+                <p class="mt-2">אין הזמנות להצגה</p>
+            </div>
         </div>
     </div>
 </div>
 
-<footer class="text-center py-3 mt-4 text-muted no-print">
-    <small>🍪 מערכת ניהול הזמנות - אפייה ביתית | נבנה באהבה 💜</small>
+<!-- Order Modal -->
+<div class="modal fade" id="orderModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">➕ הזמנה חדשה</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editIndex" value="-1">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">👤 שם לקוח</label>
+                        <input type="text" class="form-control" id="orderName" placeholder="שם מלא">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">📱 טלפון</label>
+                        <input type="tel" class="form-control" id="orderPhone" placeholder="050-0000000">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">📅 תאריך הזמנה</label>
+                        <input type="date" class="form-control" id="orderDate">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">💰 עלות (₪)</label>
+                        <input type="number" class="form-control" id="orderPrice" placeholder="0" min="0">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">🍰 פריטים</label>
+                        <div class="card p-3" style="background:#fff8f0;">
+                            <div class="product-row">
+                                <label style="width:160px;">אלפחורס</label>
+                                <input type="number" class="form-control qty-input" id="qty_alfajores" min="0" value="0">
+                            </div>
+                            <div class="product-row">
+                                <label style="width:160px;">מגולגלות</label>
+                                <input type="number" class="form-control qty-input" id="qty_mgulgalot" min="0" value="0">
+                            </div>
+                            <div class="product-row">
+                                <label style="width:160px;">שמרים</label>
+                                <input type="number" class="form-control qty-input" id="qty_shmarim" min="0" value="0">
+                            </div>
+                            <div class="product-row">
+                                <label style="width:160px;">עוגיית שוקולד ציפס</label>
+                                <input type="number" class="form-control qty-input" id="qty_chocochip" min="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">💳 שולם?</label>
+                        <select class="form-select" id="orderPaid">
+                            <option value="no">❌ לא</option>
+                            <option value="yes">✅ כן</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">✅ בוצע?</label>
+                        <select class="form-select" id="orderDone">
+                            <option value="no">⏳ לא</option>
+                            <option value="yes">✅ כן</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">🚚 סוג משלוח</label>
+                        <select class="form-select" id="orderDelivery" onchange="toggleAddress()">
+                            <option value="איסוף">📍 איסוף</option>
+                            <option value="משלוח">🚚 משלוח</option>
+                        </select>
+                    </div>
+                    <div class="col-12" id="addressDiv" style="display:none;">
+                        <label class="form-label fw-bold">📍 כתובת למשלוח</label>
+                        <input type="text" class="form-control" id="orderAddress" placeholder="כתובת מלאה">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">📝 הערות</label>
+                        <textarea class="form-control" id="orderNotes" rows="2" placeholder="הערות נוספות..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                <button type="button" class="btn btn-warm" onclick="saveOrder()">💾 שמור</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">🗑️ מחיקת הזמנה</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>האם למחוק את ההזמנה?</p>
+                <input type="hidden" id="deleteIndex">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">מחק</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
+    <div id="toast" class="toast align-items-center text-bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMsg"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<footer class="text-center text-muted py-4 no-print" style="font-size:0.85rem;">
+    🍪 מערכת ניהול הזמנות - אפייה ביתית &copy; 2026
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// ========== DATA ==========
+const PRODUCTS = [
+    { key: "alfajores", name: "אלפחורס" },
+    { key: "mgulgalot", name: "מגולגלות" },
+    { key: "shmarim", name: "שמרים" },
+    { key: "chocochip", name: "עוגיית שוקולד ציפס" }
+];
+
 let orders = JSON.parse(localStorage.getItem("bakery_orders")) || [];
 
-function saveOrders() {
+function save() {
     localStorage.setItem("bakery_orders", JSON.stringify(orders));
 }
 
-// ========== ADD ORDER ==========
-function addOrder() {
-    const name = document.getElementById("f-name").value.trim();
-    const phone = document.getElementById("f-phone").value.trim();
-    const date = document.getElementById("f-date").value;
-    const delivery = document.getElementById("f-delivery").value;
-    const price = parseFloat(document.getElementById("f-price").value) || 0;
-    const paid = document.getElementById("f-paid").checked;
-    const done = document.getElementById("f-done").checked;
-
-    if (!name) { alert("⚠️ יש להזין שם לקוח"); return; }
-    if (!date) { alert("⚠️ יש לבחור תאריך"); return; }
-
-    // Collect products
-    const products = [];
-    const pIds = ["alfachores", "megulgalot", "shmarim", "chocochip"];
-    const pNames = ["אלפחורס", "מגולגלות", "שמרים", "עוגיית שוקולד ציפס"];
-    for (let i = 0; i < pIds.length; i++) {
-        const cb = document.getElementById("p-" + pIds[i]);
-        const qty = parseInt(document.getElementById("q-" + pIds[i]).value) || 0;
-        if (cb.checked && qty > 0) {
-            products.push(pNames[i] + " x" + qty);
-        }
-    }
-
-    if (products.length === 0) { alert("⚠️ יש לבחור לפחות מוצר אחד עם כמות"); return; }
-
-    const order = {
-        id: Date.now(),
-        name, phone, date, delivery, price, paid, done,
-        products: products.join(" | ")
-    };
-
-    orders.push(order);
-    saveOrders();
-    renderOrders();
-    updateDashboard();
-    clearForm();
+function showToast(msg, type = "success") {
+    const t = document.getElementById("toast");
+    t.className = `toast align-items-center text-bg-${type} border-0`;
+    document.getElementById("toastMsg").textContent = msg;
+    new bootstrap.Toast(t).show();
 }
 
-function clearForm() {
-    document.getElementById("f-name").value = "";
-    document.getElementById("f-phone").value = "";
-    document.getElementById("f-date").value = "";
-    document.getElementById("f-price").value = "";
-    document.getElementById("f-paid").checked = false;
-    document.getElementById("f-done").checked = false;
-    const pIds = ["alfachores", "megulgalot", "shmarim", "chocochip"];
-    pIds.forEach(id => {
-        document.getElementById("p-" + id).checked = false;
-        document.getElementById("q-" + id).value = 0;
+function toggleAddress() {
+    document.getElementById("addressDiv").style.display =
+        document.getElementById("orderDelivery").value === "משלוח" ? "block" : "none";
+}
+
+function resetForm() {
+    document.getElementById("editIndex").value = -1;
+    document.getElementById("modalTitle").textContent = "➕ הזמנה חדשה";
+    document.getElementById("orderName").value = "";
+    document.getElementById("orderPhone").value = "";
+    document.getElementById("orderDate").value = new Date().toISOString().split("T")[0];
+    document.getElementById("orderPrice").value = "";
+    document.getElementById("orderPaid").value = "no";
+    document.getElementById("orderDone").value = "no";
+    document.getElementById("orderDelivery").value = "איסוף";
+    document.getElementById("orderAddress").value = "";
+    document.getElementById("orderNotes").value = "";
+    PRODUCTS.forEach(p => document.getElementById("qty_" + p.key).value = 0);
+    toggleAddress();
+}
+
+function getFormData() {
+    const items = [];
+    PRODUCTS.forEach(p => {
+        const qty = parseInt(document.getElementById("qty_" + p.key).value) || 0;
+        if (qty > 0) items.push({ name: p.name, qty });
     });
+    return {
+        name: document.getElementById("orderName").value.trim(),
+        phone: document.getElementById("orderPhone").value.trim(),
+        date: document.getElementById("orderDate").value,
+        items,
+        price: parseFloat(document.getElementById("orderPrice").value) || 0,
+        paid: document.getElementById("orderPaid").value === "yes",
+        done: document.getElementById("orderDone").value === "yes",
+        delivery: document.getElementById("orderDelivery").value,
+        address: document.getElementById("orderAddress").value.trim(),
+        notes: document.getElementById("orderNotes").value.trim(),
+        createdAt: new Date().toISOString()
+    };
 }
 
-// ========== DELETE ORDER ==========
-function deleteOrder(id) {
-    if (!confirm("❓ האם למחוק את ההזמנה?")) return;
-    orders = orders.filter(o => o.id !== id);
-    saveOrders();
+function saveOrder() {
+    const data = getFormData();
+    if (!data.name) { showToast("נא להזין שם לקוח", "danger"); return; }
+    if (!data.date) { showToast("נא להזין תאריך", "danger"); return; }
+    if (data.items.length === 0) { showToast("נא לבחור לפחות פריט אחד", "danger"); return; }
+
+    const idx = parseInt(document.getElementById("editIndex").value);
+    if (idx >= 0) {
+        data.createdAt = orders[idx].createdAt;
+        orders[idx] = data;
+        showToast("ההזמנה עודכנה בהצלחה ✅");
+    } else {
+        orders.push(data);
+        showToast("הזמנה נוספה בהצלחה ✅");
+    }
+    save();
     renderOrders();
-    updateDashboard();
+    bootstrap.Modal.getInstance(document.getElementById("orderModal")).hide();
 }
 
-// ========== TOGGLE STATUS ==========
-function togglePaid(id) {
-    const order = orders.find(o => o.id === id);
-    if (order) { order.paid = !order.paid; saveOrders(); renderOrders(); updateDashboard(); }
+function editOrder(idx) {
+    const o = orders[idx];
+    document.getElementById("editIndex").value = idx;
+    document.getElementById("modalTitle").textContent = "✏️ עריכת הזמנה";
+    document.getElementById("orderName").value = o.name;
+    document.getElementById("orderPhone").value = o.phone;
+    document.getElementById("orderDate").value = o.date;
+    document.getElementById("orderPrice").value = o.price;
+    document.getElementById("orderPaid").value = o.paid ? "yes" : "no";
+    document.getElementById("orderDone").value = o.done ? "yes" : "no";
+    document.getElementById("orderDelivery").value = o.delivery;
+    document.getElementById("orderAddress").value = o.address || "";
+    document.getElementById("orderNotes").value = o.notes || "";
+    PRODUCTS.forEach(p => {
+        const item = (o.items || []).find(i => i.name === p.name);
+        document.getElementById("qty_" + p.key).value = item ? item.qty : 0;
+    });
+    toggleAddress();
+    new bootstrap.Modal(document.getElementById("orderModal")).show();
 }
 
-function toggleDone(id) {
-    const order = orders.find(o => o.id === id);
-    if (order) { order.done = !order.done; saveOrders(); renderOrders(); updateDashboard(); }
+function deleteOrder(idx) {
+    document.getElementById("deleteIndex").value = idx;
+    new bootstrap.Modal(document.getElementById("deleteModal")).show();
 }
 
-// ========== RENDER TABLE ==========
-function renderOrders() {
-    const filterName = document.getElementById("filter-name").value.trim().toLowerCase();
-    const filterDate = document.getElementById("filter-date").value;
-    const filterStatus = document.getElementById("filter-status").value;
+function confirmDelete() {
+    const idx = parseInt(document.getElementById("deleteIndex").value);
+    orders.splice(idx, 1);
+    save();
+    renderOrders();
+    bootstrap.Modal.getInstance(document.getElementById("deleteModal")).hide();
+    showToast("ההזמנה נמחקה 🗑️", "warning");
+}
 
-    let filtered = orders.filter(o => {
-        if (filterName && !o.name.toLowerCase().includes(filterName)) return false;
-        if (filterDate && o.date !== filterDate) return false;
-        if (filterStatus === "pending" && o.done) return false;
-        if (filterStatus === "done" && !o.done) return false;
-        if (filterStatus === "unpaid" && o.paid) return false;
-        if (filterStatus === "paid" && !o.paid) return false;
+function togglePaid(idx) {
+    orders[idx].paid = !orders[idx].paid;
+    save();
+    renderOrders();
+}
+
+function toggleDone(idx) {
+    orders[idx].done = !orders[idx].done;
+    save();
+    renderOrders();
+}
+
+function openWhatsApp(phone) {
+    let cleaned = phone.replace(/[^0-9]/g, "");
+    if (cleaned.startsWith("0")) cleaned = "972" + cleaned.substring(1);
+    window.open("https://wa.me/" + cleaned, "_blank");
+}
+
+function itemsText(items) {
+    if (!items || items.length === 0) return "-";
+    return items.map(i => `${i.name} x${i.qty}`).join(", ");
+}
+
+function getFilteredOrders() {
+    const nameFilter = document.getElementById("filterName").value.trim().toLowerCase();
+    const dateFrom = document.getElementById("filterDateFrom").value;
+    const dateTo = document.getElementById("filterDateTo").value;
+    const status = document.getElementById("filterStatus").value;
+
+    return orders.filter((o, i) => {
+        if (nameFilter && !o.name.toLowerCase().includes(nameFilter)) return false;
+        if (dateFrom && o.date < dateFrom) return false;
+        if (dateTo && o.date > dateTo) return false;
+        if (status === "notDone" && o.done) return false;
+        if (status === "notPaid" && o.paid) return false;
+        if (status === "done" && !o.done) return false;
+        if (status === "paid" && !o.paid) return false;
         return true;
     });
+}
 
-    // Sort by date descending
-    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+function renderOrders() {
+    const filtered = getFilteredOrders();
     const tbody = document.getElementById("ordersBody");
+    const emptyState = document.getElementById("emptyState");
     tbody.innerHTML = "";
 
-    document.getElementById("no-results").style.display = filtered.length === 0 ? "block" : "none";
+    if (filtered.length === 0) {
+        emptyState.style.display = "block";
+    } else {
+        emptyState.style.display = "none";
+    }
 
-    filtered.forEach((o, idx) => {
-        const phoneClean = o.phone.replace(/[^0-9]/g, "");
-        const waPhone = phoneClean.startsWith("0") ? "972" + phoneClean.substring(1) : phoneClean;
-
-        tbody.innerHTML += `
-            <tr class="fade-in">
-                <td>${idx + 1}</td>
-                <td><strong>${o.name}</strong></td>
-                <td>${o.phone}</td>
-                <td>${o.date}</td>
-                <td style="font-size:0.85rem;">${o.products}</td>
-                <td><strong>₪${o.price.toLocaleString()}</strong></td>
-                <td>
-                    <span class="status-badge ${o.paid ? 'status-yes' : 'status-no'}" onclick="togglePaid(${o.id})" title="לחץ לשינוי">
-                        ${o.paid ? '✅ שולם' : '❌ לא שולם'}
-                    </span>
-                </td>
-                <td>
-                    <span class="status-badge ${o.done ? 'status-yes' : 'status-no'}" onclick="toggleDone(${o.id})" title="לחץ לשינוי">
-                        ${o.done ? '✅ בוצע' : '⏳ ממתין'}
-                    </span>
-                </td>
-                <td>${o.delivery === 'משלוח' ? '🚚 משלוח' : '🏠 איסוף'}</td>
-                <td class="no-print">
-                    <a class="btn-whatsapp" href="https://wa.me/${waPhone}" target="_blank" title="שלח וואטסאפ">💬</a>
-                    <button class="btn-delete" onclick="deleteOrder(${o.id})" title="מחק הזמנה">🗑️</button>
-                </td>
-            </tr>
+    filtered.forEach(o => {
+        const realIdx = orders.indexOf(o);
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${realIdx + 1}</td>
+            <td><strong>${escHtml(o.name)}</strong>${o.notes ? '<br><small class="text-muted">' + escHtml(o.notes) + '</small>' : ''}</td>
+            <td>
+                ${escHtml(o.phone)}
+                ${o.phone ? '<br><span class="whatsapp-btn no-print" onclick="openWhatsApp(\'' + escHtml(o.phone) + '\')"><i class="bi bi-whatsapp"></i></span>' : ''}
+            </td>
+            <td>${o.date || "-"}</td>
+            <td style="font-size:0.85rem;">${escHtml(itemsText(o.items))}</td>
+            <td><strong>₪${o.price}</strong></td>
+            <td>
+                <span class="badge ${o.paid ? 'badge-paid' : 'badge-unpaid'} no-print" style="cursor:pointer;" onclick="togglePaid(${realIdx})">
+                    ${o.paid ? '✅ שולם' : '❌ לא שולם'}
+                </span>
+                <span class="d-none d-print-inline">${o.paid ? 'שולם' : 'לא שולם'}</span>
+            </td>
+            <td>
+                <span class="badge ${o.done ? 'badge-done' : 'badge-pending'} no-print" style="cursor:pointer;" onclick="toggleDone(${realIdx})">
+                    ${o.done ? '✅ בוצע' : '⏳ ממתין'}
+                </span>
+                <span class="d-none d-print-inline">${o.done ? 'בוצע' : 'ממתין'}</span>
+            </td>
+            <td>
+                <span class="badge ${o.delivery === 'משלוח' ? 'badge-delivery' : 'badge-pickup'}">
+                    ${o.delivery === 'משלוח' ? '🚚 משלוח' : '📍 איסוף'}
+                </span>
+                ${o.delivery === 'משלוח' && o.address ? '<br><small>' + escHtml(o.address) + '</small>' : ''}
+            </td>
+            <td class="no-print">
+                <button class="btn btn-sm btn-outline-primary mb-1" onclick="editOrder(${realIdx})" title="עריכה"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger mb-1" onclick="deleteOrder(${realIdx})" title="מחיקה"><i class="bi bi-trash"></i></button>
+            </td>
         `;
+        tbody.appendChild(row);
     });
+
+    updateDashboard();
 }
 
-// ========== DASHBOARD ==========
 function updateDashboard() {
-    document.getElementById("d-total").textContent = orders.length;
-    document.getElementById("d-revenue").textContent = "₪" + orders.reduce((s, o) => s + o.price, 0).toLocaleString();
-    document.getElementById("d-paid").textContent = "₪" + orders.filter(o => o.paid).reduce((s, o) => s + o.price, 0).toLocaleString();
-    document.getElementById("d-unpaid").textContent = "₪" + orders.filter(o => !o.paid).reduce((s, o) => s + o.price, 0).toLocaleString();
-    document.getElementById("d-done").textContent = orders.filter(o => o.done).length;
-    document.getElementById("d-pending").textContent = orders.filter(o => !o.done).length;
+    const total = orders.length;
+    const revenue = orders.reduce((s, o) => s + (o.price || 0), 0);
+    const paid = orders.filter(o => o.paid).length;
+    const done = orders.filter(o => o.done).length;
+
+    document.getElementById("dashTotal").textContent = total;
+    document.getElementById("dashRevenue").textContent = "₪" + revenue.toLocaleString();
+    document.getElementById("dashPaid").textContent = `${paid} / ${total - paid}`;
+    document.getElementById("dashDone").textContent = `${done} / ${total - done}`;
 }
 
-// ========== FILTERS ==========
 function clearFilters() {
-    document.getElementById("filter-name").value = "";
-    document.getElementById("filter-date").value = "";
-    document.getElementById("filter-status").value = "all";
+    document.getElementById("filterName").value = "";
+    document.getElementById("filterDateFrom").value = "";
+    document.getElementById("filterDateTo").value = "";
+    document.getElementById("filterStatus").value = "all";
     renderOrders();
 }
 
-// ========== CSV EXPORT ==========
+function escHtml(str) {
+    if (!str) return "";
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// ========== CSV Export ==========
 function exportCSV() {
-    if (orders.length === 0) { alert("⚠️ אין הזמנות לייצוא"); return; }
+    if (orders.length === 0) { showToast("אין הזמנות לייצוא", "warning"); return; }
 
-    const BOM = "\uFEFF";
-    const headers = ["מזהה","שם לקוח","טלפון","תאריך","מוצרים","עלות","שולם","בוצע","סוג"];
-    let csv = BOM + headers.join(",") + "\n";
+    const headers = ["שם לקוח","טלפון","תאריך","פריטים","עלות","שולם","בוצע","סוג","כתובת","הערות"];
+    const rows = orders.map(o => [
+        o.name,
+        o.phone,
+        o.date,
+        itemsText(o.items),
+        o.price,
+        o.paid ? "כן" : "לא",
+        o.done ? "כן" : "לא",
+        o.delivery,
+        o.address || "",
+        o.notes || ""
+    ]);
 
-    orders.forEach(o => {
-        const row = [
-            o.id,
-            '"' + o.name.replace(/"/g, '""') + '"',
-            '"' + o.phone + '"',
-            o.date,
-            '"' + o.products.replace(/"/g, '""') + '"',
-            o.price,
-            o.paid ? "כן" : "לא",
-            o.done ? "כן" : "לא",
-            o.delivery
-        ];
-        csv += row.join(",") + "\n";
+    let csv = "\uFEFF"; // BOM for Hebrew encoding
+    csv += headers.join(",") + "\n";
+    rows.forEach(r => {
+        csv += r.map(cell => '"' + String(cell).replace(/"/g, '""') + '"').join(",") + "\n";
     });
 
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "orders_" + new Date().toISOString().slice(0,10) + ".csv";
-    link.click();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "orders_" + new Date().toISOString().split("T")[0] + ".csv";
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast("הקובץ יוצא בהצלחה 📁");
 }
 
-// ========== CSV IMPORT ==========
+// ========== CSV Import ==========
 function importCSV(event) {
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = function(e) {
-        const text = e.target.result.replace(/^\uFEFF/, "");
+        const text = e.target.result;
         const lines = text.split("\n").filter(l => l.trim());
+        if (lines.length < 2) { showToast("הקובץ ריק", "danger"); return; }
 
-        if (lines.length < 2) { alert("⚠️ הקובץ ריק או לא תקין"); return; }
-
-        const newOrders = [];
+        const imported = [];
         for (let i = 1; i < lines.length; i++) {
-            // Parse CSV line respecting quotes
             const cols = parseCSVLine(lines[i]);
-            if (cols.length < 9) continue;
+            if (cols.length < 8) continue;
 
-            newOrders.push({
-                id: parseInt(cols[0]) || Date.now() + i,
-                name: cols[1],
-                phone: cols[2],
-                date: cols[3],
-                products: cols[4],
-                price: parseFloat(cols[5]) || 0,
-                paid: cols[6] === "כן",
-                done: cols[7] === "כן",
-                delivery: cols[8]
+            const items = [];
+            const itemsStr = cols[3] || "";
+            itemsStr.split(",").forEach(part => {
+                part = part.trim();
+                const match = part.match(/^(.+?)\s*x(\d+)$/);
+                if (match) items.push({ name: match[1].trim(), qty: parseInt(match[2]) });
+            });
+
+            imported.push({
+                name: cols[0] || "",
+                phone: cols[1] || "",
+                date: cols[2] || "",
+                items,
+                price: parseFloat(cols[4]) || 0,
+                paid: cols[5] === "כן",
+                done: cols[6] === "כן",
+                delivery: cols[7] || "איסוף",
+                address: cols[8] || "",
+                notes: cols[9] || "",
+                createdAt: new Date().toISOString()
             });
         }
 
-        if (newOrders.length === 0) { alert("⚠️ לא נמצאו הזמנות בקובץ"); return; }
-
-        if (confirm(`📥 נמצאו ${newOrders.length} הזמנות. האם לטעון אותן? (ההזמנות הקיימות יוחלפו)`)) {
-            orders = newOrders;
-            saveOrders();
-            renderOrders();
-            updateDashboard();
-            alert("✅ הנתונים נטענו בהצלחה!");
-        }
+        orders = orders.concat(imported);
+        save();
+        renderOrders();
+        showToast(`יובאו ${imported.length} הזמנות בהצלחה ✅`);
     };
-    reader.readAsText(file);
+    reader.readAsText(file, "utf-8");
     event.target.value = "";
 }
 
@@ -514,33 +626,33 @@ function parseCSVLine(line) {
     for (let i = 0; i < line.length; i++) {
         const ch = line[i];
         if (inQuotes) {
-            if (ch === '"' && i + 1 < line.length && line[i+1] === '"') {
-                current += '"';
-                i++;
-            } else if (ch === '"') {
-                inQuotes = false;
-            } else {
-                current += ch;
-            }
+            if (ch === '"' && line[i + 1] === '"') { current += '"'; i++; }
+            else if (ch === '"') inQuotes = false;
+            else current += ch;
         } else {
-            if (ch === '"') {
-                inQuotes = true;
-            } else if (ch === ',') {
-                result.push(current.trim());
-                current = "";
-            } else {
-                current += ch;
-            }
+            if (ch === '"') inQuotes = true;
+            else if (ch === ',') { result.push(current.trim()); current = ""; }
+            else current += ch;
         }
     }
     result.push(current.trim());
     return result;
 }
 
-// ========== INIT ==========
-document.getElementById("f-date").value = new Date().toISOString().slice(0, 10);
+// ========== Print ==========
+function printOrders() { window.print(); }
+
+// ========== Init ==========
 renderOrders();
-updateDashboard();
+
+// Basic service worker for PWA
+if ("serviceWorker" in navigator) {
+    const swBlob = new Blob([`
+        self.addEventListener("install", e => self.skipWaiting());
+        self.addEventListener("fetch", e => e.respondWith(fetch(e.request).catch(() => new Response("Offline"))));
+    `], { type: "application/javascript" });
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+}
 </script>
 
 </body>
