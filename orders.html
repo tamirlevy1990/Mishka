@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍪 ניהול הזמנות - אפייה ביתית</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e8a87c;
+            --secondary: #d65db1;
+            --accent: #ff6f91;
+            --bg: #fff5ee;
+            --card-bg: #ffffff;
+            --text: #3d3d3d;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .navbar-brand { font-size: 1.5rem; font-weight: bold; }
+        .dashboard-card {
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .dashboard-card:hover { transform: translateY(-4px); }
+        .dashboard-card .number { font-size: 2rem; font-weight: bold; }
+        .dashboard-card .label { font-size: 0.9rem; opacity: 0.9; }
+        .bg-orders { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .bg-revenue { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .bg-paid { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .bg-unpaid { background: linear-gradient(135deg, #fa709a, #fee140); }
+        .bg-done { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .bg-pending { background: linear-gradient(135deg, #fccb90, #d57eeb); }
+        .form-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .product-item {
+            background: #f8f0ea;
+            border-radius: 12px;
+            padding: 10px 15px;
+            margin: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .product-item input[type="number"] {
+            width: 60px;
+            text-align: center;
+        }
+        .table-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        .table thead th {
+            background: #764ba2;
+            color: #fff;
+            border: none;
+            white-space: nowrap;
+        }
+        .table tbody tr:hover { background: #f8f0ea; }
+        .status-badge {
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            user-select: none;
+        }
+        .status-yes { background: #d4edda; }
+        .status-no { background: #f8d7da; }
+        .btn-whatsapp {
+            background: #25d366;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: 0.2s;
+        }
+        .btn-whatsapp:hover { background: #128c7e; color: #fff; transform: scale(1.1); }
+        .btn-delete {
+            background: #ff6b6b;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .btn-delete:hover { background: #ee5a24; transform: scale(1.1); }
+        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 15px; }
+        .filter-bar input, .filter-bar select { border-radius: 10px; }
+        .btn-action {
+            border-radius: 12px;
+            padding: 8px 18px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .btn-action:hover { transform: translateY(-2px); }
+        .section-title { font-weight: bold; color: #764ba2; margin-bottom: 15px; }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #fff; }
+            .dashboard-card { box-shadow: none; border: 1px solid #ccc; }
+            .form-section { display: none; }
+            .filter-bar { display: none !important; }
+        }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-dark no-print" style="background: linear-gradient(135deg, #764ba2, #e8a87c);">
+    <div class="container">
+        <span class="navbar-brand">🍪 מערכת ניהול הזמנות - אפייה ביתית</span>
+        <div>
+            <button class="btn btn-sm btn-outline-light btn-action me-2" onclick="exportCSV()">📥 ייצוא CSV</button>
+            <label class="btn btn-sm btn-outline-light btn-action me-2">
+                📤 ייבוא CSV
+                <input type="file" id="csvImport" accept=".csv" onchange="importCSV(event)" hidden>
+            </label>
+            <button class="btn btn-sm btn-outline-light btn-action" onclick="window.print()">🖨️ הדפסה</button>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- Dashboard -->
+    <div class="row g-3 mb-4" id="dashboard">
+        <div class="col-6 col-md-2"><div class="dashboard-card bg-orders fade-in"><div class="number" id="d-total">0</div><div class="label">📋 סה"כ הזמנות</div></div></div>
+        <div class="col-6 col-md-2"><div class="dashboard-card bg-revenue fade-in"><div class="number" id="d-revenue">0</div><div class="label">💰 סה"כ הכנסות</div></div></div>
+        <div class="col-6 col-md-2"><div class="dashboard-card bg-paid fade-in"><div class="number" id="d-paid">0</div><div class="label">✅ שולם</div></div></div>
+        <div class="col-6 col-md-2"><div class="dashboard-card bg-unpaid fade-in"><div class="number" id="d-unpaid">0</div><div class="label">❌ לא שולם</div></div></div>
+        <div class="col-6 col-md-2"><div class="dashboard-card bg-done fade-in"><div class="number" id="d-done">0</div><div class="label">🎉 בוצע</div></div></div>
+        <div class="col-6 col-md-2"><div class="dashboard-card bg-pending fade-in"><div class="number" id="d-pending">0</div><div class="label">⏳ ממתין</div></div></div>
+    </div>
+
+    <!-- Add Order Form -->
+    <div class="form-section no-print fade-in">
+        <h4 class="section-title">➕ הוספת הזמנה חדשה</h4>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">👤 שם לקוח</label>
+                <input type="text" class="form-control" id="f-name" placeholder="שם מלא">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">📞 טלפון</label>
+                <input type="tel" class="form-control" id="f-phone" placeholder="050-1234567">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">📅 תאריך הזמנה</label>
+                <input type="date" class="form-control" id="f-date">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">🚚 סוג</label>
+                <select class="form-select" id="f-delivery">
+                    <option value="איסוף">🏠 איסוף</option>
+                    <option value="משלוח">🚚 משלוח</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label">🍰 מוצרים וכמויות</label>
+            <div id="products-container">
+                <div class="product-item">
+                    <input type="checkbox" class="form-check-input" id="p-alfachores" value="אלפחורס">
+                    <label for="p-alfachores">אלפחורס</label>
+                    <input type="number" class="form-control form-control-sm" id="q-alfachores" min="0" value="0" placeholder="כמות">
+                </div>
+                <div class="product-item">
+                    <input type="checkbox" class="form-check-input" id="p-megulgalot" value="מגולגלות">
+                    <label for="p-megulgalot">מגולגלות</label>
+                    <input type="number" class="form-control form-control-sm" id="q-megulgalot" min="0" value="0" placeholder="כמות">
+                </div>
+                <div class="product-item">
+                    <input type="checkbox" class="form-check-input" id="p-shmarim" value="שמרים">
+                    <label for="p-shmarim">שמרים</label>
+                    <input type="number" class="form-control form-control-sm" id="q-shmarim" min="0" value="0" placeholder="כמות">
+                </div>
+                <div class="product-item">
+                    <input type="checkbox" class="form-check-input" id="p-chocochip" value="עוגיית שוקולד ציפס">
+                    <label for="p-chocochip">עוגיית שוקולד ציפס</label>
+                    <input type="number" class="form-control form-control-sm" id="q-chocochip" min="0" value="0" placeholder="כמות">
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+            <div class="col-md-3">
+                <label class="form-label">💵 עלות כוללת</label>
+                <input type="number" class="form-control" id="f-price" placeholder="₪" min="0">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="f-paid">
+                    <label class="form-check-label" for="f-paid">💰 שולם</label>
+                </div>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="f-done">
+                    <label class="form-check-label" for="f-done">✅ בוצע</label>
+                </div>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button class="btn btn-lg w-100 text-white btn-action" style="background: linear-gradient(135deg, #764ba2, #e8a87c);" onclick="addOrder()">➕ הוסף הזמנה</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="table-section fade-in">
+        <h4 class="section-title">📦 רשימת הזמנות</h4>
+        <div class="filter-bar no-print">
+            <input type="text" class="form-control" id="filter-name" placeholder="🔍 חיפוש לפי שם לקוח" oninput="renderOrders()" style="max-width:220px;">
+            <input type="date" class="form-control" id="filter-date" onchange="renderOrders()" style="max-width:180px;">
+            <select class="form-select" id="filter-status" onchange="renderOrders()" style="max-width:180px;">
+                <option value="all">📋 הכל</option>
+                <option value="pending">⏳ לא בוצע</option>
+                <option value="done">✅ בוצע</option>
+                <option value="unpaid">❌ לא שולם</option>
+                <option value="paid">💰 שולם</option>
+            </select>
+            <button class="btn btn-outline-secondary btn-action" onclick="clearFilters()">🔄 נקה מסננים</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>👤 שם</th>
+                        <th>📞 טלפון</th>
+                        <th>📅 תאריך</th>
+                        <th>🍰 מוצרים</th>
+                        <th>💵 עלות</th>
+                        <th>💰 שולם</th>
+                        <th>✅ בוצע</th>
+                        <th>🚚 סוג</th>
+                        <th class="no-print">פעולות</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersBody"></tbody>
+            </table>
+        </div>
+        <div id="no-results" class="text-center text-muted py-4" style="display:none;">
+            <span style="font-size:2rem;">🔍</span><br>לא נמצאו הזמנות
+        </div>
+    </div>
+</div>
+
+<footer class="text-center py-3 mt-4 text-muted no-print">
+    <small>🍪 מערכת ניהול הזמנות - אפייה ביתית | נבנה באהבה 💜</small>
+</footer>
+
+<script>
+// ========== DATA ==========
+let orders = JSON.parse(localStorage.getItem("bakery_orders")) || [];
+
+function saveOrders() {
+    localStorage.setItem("bakery_orders", JSON.stringify(orders));
+}
+
+// ========== ADD ORDER ==========
+function addOrder() {
+    const name = document.getElementById("f-name").value.trim();
+    const phone = document.getElementById("f-phone").value.trim();
+    const date = document.getElementById("f-date").value;
+    const delivery = document.getElementById("f-delivery").value;
+    const price = parseFloat(document.getElementById("f-price").value) || 0;
+    const paid = document.getElementById("f-paid").checked;
+    const done = document.getElementById("f-done").checked;
+
+    if (!name) { alert("⚠️ יש להזין שם לקוח"); return; }
+    if (!date) { alert("⚠️ יש לבחור תאריך"); return; }
+
+    // Collect products
+    const products = [];
+    const pIds = ["alfachores", "megulgalot", "shmarim", "chocochip"];
+    const pNames = ["אלפחורס", "מגולגלות", "שמרים", "עוגיית שוקולד ציפס"];
+    for (let i = 0; i < pIds.length; i++) {
+        const cb = document.getElementById("p-" + pIds[i]);
+        const qty = parseInt(document.getElementById("q-" + pIds[i]).value) || 0;
+        if (cb.checked && qty > 0) {
+            products.push(pNames[i] + " x" + qty);
+        }
+    }
+
+    if (products.length === 0) { alert("⚠️ יש לבחור לפחות מוצר אחד עם כמות"); return; }
+
+    const order = {
+        id: Date.now(),
+        name, phone, date, delivery, price, paid, done,
+        products: products.join(" | ")
+    };
+
+    orders.push(order);
+    saveOrders();
+    renderOrders();
+    updateDashboard();
+    clearForm();
+}
+
+function clearForm() {
+    document.getElementById("f-name").value = "";
+    document.getElementById("f-phone").value = "";
+    document.getElementById("f-date").value = "";
+    document.getElementById("f-price").value = "";
+    document.getElementById("f-paid").checked = false;
+    document.getElementById("f-done").checked = false;
+    const pIds = ["alfachores", "megulgalot", "shmarim", "chocochip"];
+    pIds.forEach(id => {
+        document.getElementById("p-" + id).checked = false;
+        document.getElementById("q-" + id).value = 0;
+    });
+}
+
+// ========== DELETE ORDER ==========
+function deleteOrder(id) {
+    if (!confirm("❓ האם למחוק את ההזמנה?")) return;
+    orders = orders.filter(o => o.id !== id);
+    saveOrders();
+    renderOrders();
+    updateDashboard();
+}
+
+// ========== TOGGLE STATUS ==========
+function togglePaid(id) {
+    const order = orders.find(o => o.id === id);
+    if (order) { order.paid = !order.paid; saveOrders(); renderOrders(); updateDashboard(); }
+}
+
+function toggleDone(id) {
+    const order = orders.find(o => o.id === id);
+    if (order) { order.done = !order.done; saveOrders(); renderOrders(); updateDashboard(); }
+}
+
+// ========== RENDER TABLE ==========
+function renderOrders() {
+    const filterName = document.getElementById("filter-name").value.trim().toLowerCase();
+    const filterDate = document.getElementById("filter-date").value;
+    const filterStatus = document.getElementById("filter-status").value;
+
+    let filtered = orders.filter(o => {
+        if (filterName && !o.name.toLowerCase().includes(filterName)) return false;
+        if (filterDate && o.date !== filterDate) return false;
+        if (filterStatus === "pending" && o.done) return false;
+        if (filterStatus === "done" && !o.done) return false;
+        if (filterStatus === "unpaid" && o.paid) return false;
+        if (filterStatus === "paid" && !o.paid) return false;
+        return true;
+    });
+
+    // Sort by date descending
+    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const tbody = document.getElementById("ordersBody");
+    tbody.innerHTML = "";
+
+    document.getElementById("no-results").style.display = filtered.length === 0 ? "block" : "none";
+
+    filtered.forEach((o, idx) => {
+        const phoneClean = o.phone.replace(/[^0-9]/g, "");
+        const waPhone = phoneClean.startsWith("0") ? "972" + phoneClean.substring(1) : phoneClean;
+
+        tbody.innerHTML += `
+            <tr class="fade-in">
+                <td>${idx + 1}</td>
+                <td><strong>${o.name}</strong></td>
+                <td>${o.phone}</td>
+                <td>${o.date}</td>
+                <td style="font-size:0.85rem;">${o.products}</td>
+                <td><strong>₪${o.price.toLocaleString()}</strong></td>
+                <td>
+                    <span class="status-badge ${o.paid ? 'status-yes' : 'status-no'}" onclick="togglePaid(${o.id})" title="לחץ לשינוי">
+                        ${o.paid ? '✅ שולם' : '❌ לא שולם'}
+                    </span>
+                </td>
+                <td>
+                    <span class="status-badge ${o.done ? 'status-yes' : 'status-no'}" onclick="toggleDone(${o.id})" title="לחץ לשינוי">
+                        ${o.done ? '✅ בוצע' : '⏳ ממתין'}
+                    </span>
+                </td>
+                <td>${o.delivery === 'משלוח' ? '🚚 משלוח' : '🏠 איסוף'}</td>
+                <td class="no-print">
+                    <a class="btn-whatsapp" href="https://wa.me/${waPhone}" target="_blank" title="שלח וואטסאפ">💬</a>
+                    <button class="btn-delete" onclick="deleteOrder(${o.id})" title="מחק הזמנה">🗑️</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+// ========== DASHBOARD ==========
+function updateDashboard() {
+    document.getElementById("d-total").textContent = orders.length;
+    document.getElementById("d-revenue").textContent = "₪" + orders.reduce((s, o) => s + o.price, 0).toLocaleString();
+    document.getElementById("d-paid").textContent = "₪" + orders.filter(o => o.paid).reduce((s, o) => s + o.price, 0).toLocaleString();
+    document.getElementById("d-unpaid").textContent = "₪" + orders.filter(o => !o.paid).reduce((s, o) => s + o.price, 0).toLocaleString();
+    document.getElementById("d-done").textContent = orders.filter(o => o.done).length;
+    document.getElementById("d-pending").textContent = orders.filter(o => !o.done).length;
+}
+
+// ========== FILTERS ==========
+function clearFilters() {
+    document.getElementById("filter-name").value = "";
+    document.getElementById("filter-date").value = "";
+    document.getElementById("filter-status").value = "all";
+    renderOrders();
+}
+
+// ========== CSV EXPORT ==========
+function exportCSV() {
+    if (orders.length === 0) { alert("⚠️ אין הזמנות לייצוא"); return; }
+
+    const BOM = "\uFEFF";
+    const headers = ["מזהה","שם לקוח","טלפון","תאריך","מוצרים","עלות","שולם","בוצע","סוג"];
+    let csv = BOM + headers.join(",") + "\n";
+
+    orders.forEach(o => {
+        const row = [
+            o.id,
+            '"' + o.name.replace(/"/g, '""') + '"',
+            '"' + o.phone + '"',
+            o.date,
+            '"' + o.products.replace(/"/g, '""') + '"',
+            o.price,
+            o.paid ? "כן" : "לא",
+            o.done ? "כן" : "לא",
+            o.delivery
+        ];
+        csv += row.join(",") + "\n";
+    });
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "orders_" + new Date().toISOString().slice(0,10) + ".csv";
+    link.click();
+}
+
+// ========== CSV IMPORT ==========
+function importCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result.replace(/^\uFEFF/, "");
+        const lines = text.split("\n").filter(l => l.trim());
+
+        if (lines.length < 2) { alert("⚠️ הקובץ ריק או לא תקין"); return; }
+
+        const newOrders = [];
+        for (let i = 1; i < lines.length; i++) {
+            // Parse CSV line respecting quotes
+            const cols = parseCSVLine(lines[i]);
+            if (cols.length < 9) continue;
+
+            newOrders.push({
+                id: parseInt(cols[0]) || Date.now() + i,
+                name: cols[1],
+                phone: cols[2],
+                date: cols[3],
+                products: cols[4],
+                price: parseFloat(cols[5]) || 0,
+                paid: cols[6] === "כן",
+                done: cols[7] === "כן",
+                delivery: cols[8]
+            });
+        }
+
+        if (newOrders.length === 0) { alert("⚠️ לא נמצאו הזמנות בקובץ"); return; }
+
+        if (confirm(`📥 נמצאו ${newOrders.length} הזמנות. האם לטעון אותן? (ההזמנות הקיימות יוחלפו)`)) {
+            orders = newOrders;
+            saveOrders();
+            renderOrders();
+            updateDashboard();
+            alert("✅ הנתונים נטענו בהצלחה!");
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = "";
+}
+
+function parseCSVLine(line) {
+    const result = [];
+    let current = "";
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inQuotes) {
+            if (ch === '"' && i + 1 < line.length && line[i+1] === '"') {
+                current += '"';
+                i++;
+            } else if (ch === '"') {
+                inQuotes = false;
+            } else {
+                current += ch;
+            }
+        } else {
+            if (ch === '"') {
+                inQuotes = true;
+            } else if (ch === ',') {
+                result.push(current.trim());
+                current = "";
+            } else {
+                current += ch;
+            }
+        }
+    }
+    result.push(current.trim());
+    return result;
+}
+
+// ========== INIT ==========
+document.getElementById("f-date").value = new Date().toISOString().slice(0, 10);
+renderOrders();
+updateDashboard();
+</script>
+
+</body>
+</html>
